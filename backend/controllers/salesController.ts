@@ -25,7 +25,8 @@ export async function uploadFile(req: Request, res: Response): Promise<void> {
     const aggregatedData = await processSalesData(req.file.path, outputPath);
 
     // Generate download URL
-    const downloadUrl = `https://sales-csv-processor-backend.onrender.com/output/${fileId}.csv`;
+    // const downloadUrl = `https://sales-csv-processor-backend.onrender.com/output/${fileId}.csv`;
+    const downloadUrl = `http://localhost:5500/output/${fileId}.csv`;
 
     const response: UploadResponse = {
       fileId,
