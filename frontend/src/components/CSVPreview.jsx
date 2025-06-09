@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { parse } from "papaparse";
 
+// providing preview when a user selects a csv file, maximum of 5 rows since it's just a preview
+
 const CSVPreview = ({ file, maxRows = 5 }) => {
   const [previewData, setPreviewData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);

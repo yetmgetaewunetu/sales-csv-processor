@@ -18,9 +18,10 @@ export async function uploadFile(req: Request, res: Response): Promise<void> {
     }
 
     const fileId = uuidv4();
-    const outputPath = path.resolve("output", `${fileId}.csv`); // Use path.resolve for output
+    // i will use this path for storing the outupt data, some demo is availabe on the github rep /backend/outputs
+    const outputPath = path.resolve("output", `${fileId}.csv`);
 
-    // Process the file and get aggregated data
+    // Processing the file and get aggregated data
     const aggregatedData = await processSalesData(req.file.path, outputPath);
 
     // Generate download URL

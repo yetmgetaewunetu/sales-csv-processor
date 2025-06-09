@@ -1,6 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 
+// this function contains everything required  for the file upload form, which includes the states, that allows to show progress indicator
 export const useFileUpload = () => {
   const [state, setState] = useState({
     file: null,

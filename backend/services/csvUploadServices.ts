@@ -45,7 +45,7 @@ export async function processSalesData(
   writeStream.end();
   console.log(aggregatedData);
 
-  // Clean up uploaded file
+  // Clean up uploaded file, to avoid performanc and memory issues
   fs.unlinkSync(filePath);
   return aggregatedData;
 }

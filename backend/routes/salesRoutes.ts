@@ -13,6 +13,7 @@ if (!fs.existsSync(uploadDir)) {
 const upload = multer({ dest: uploadDir }); // Use relative path for uploads
 const router = express.Router();
 
+// attached the file and sent it to the controller in the request
 router.post("/upload", upload.single("file"), uploadFile);
 
 export default router;

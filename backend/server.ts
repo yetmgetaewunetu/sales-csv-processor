@@ -15,7 +15,8 @@ app.use(
 );
 const port = process.env.PORT;
 
-app.use("/output", express.static(path.resolve("output"))); // Use path.resolve for static path
+//output folder will be used for static files(csv created)
+app.use("/output", express.static(path.resolve("output")));
 app.use("/", csvRoutes);
 
 app.listen(port, (err) => {

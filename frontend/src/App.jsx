@@ -1,7 +1,4 @@
-import React, { useState } from "react";
-import FileUpload from "./components/FileUploadComponent";
 import { CSVUploadForm } from "./components/CSVUploadForm";
-import { Overlay } from "./components/overlay";
 
 const App = () => {
   return (

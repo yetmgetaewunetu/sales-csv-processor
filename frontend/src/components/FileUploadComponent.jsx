@@ -1,9 +1,10 @@
 import { useState, useRef } from "react";
 
+//custom file upload component
 const FileUpload = ({
   multiple = false,
   accept = "*",
-  maxSize = 10, // in MB
+  maxSize = 10,
   onFileUpload,
   disabled = false,
 }) => {
@@ -45,7 +46,6 @@ const FileUpload = ({
       return;
     }
 
-    // If not multiple, only keep the first file
     const validatedFiles = multiple ? fileList : [fileList[0]];
     setFiles(validatedFiles);
 

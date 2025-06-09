@@ -4,14 +4,14 @@ import { FileInfoDisplay } from "./FileInfoDisplay";
 import { DownloadLink } from "./DownloadLink";
 import { ErrorDisplay } from "./ErrorDisplay";
 import CSVPreview from "./CSVPreview";
-import { Overlay } from "./overlay";
 
+// the entry for the upload form
+// includes custom upload component and button to send post request to backend server
 export const CSVUploadForm = () => {
   const [link, setLink] = useState(null);
   const fileInputRef = useRef(null);
   const { file, isUploading, downloadLink, error, setFile, uploadFile } =
     useFileUpload();
-  // const [isOpen, setIsOpen] = useState(false);
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];

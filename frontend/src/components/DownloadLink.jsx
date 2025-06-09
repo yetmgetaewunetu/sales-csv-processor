@@ -1,3 +1,5 @@
+// download link button that is displayed when a processed csv file is returned
+
 export const DownloadLink = ({ downloadLink }) => (
   <div className="mt-4 p-3 bg-green-50 rounded-md border border-green-200">
     <p className="text-sm text-green-800 mb-2">File processed successfully!</p>
