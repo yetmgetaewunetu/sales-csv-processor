@@ -10,7 +10,7 @@ dotenv.config();
 app.use(express.json());
 app.use(
   cors({
-    origin: ["http://localhost:5173"],
+    origin: ["https://sales-csv-processor-frontend.onrender.com"],
   })
 );
 const port = process.env.PORT;
