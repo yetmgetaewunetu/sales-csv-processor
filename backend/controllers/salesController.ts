@@ -23,31 +23,6 @@ interface FileRequest extends Request {
   };
 }
 
-// Controller for handling CSV file uploads and processing
-export const uploadSalesData = async (req: Request, res: Response) => {
-  try {
-    // Check if file was uploaded
-    if (!req.file) {
-      return res.status(400).json({ error: "No file uploaded" });
-    }
-
-    console.log("Processing file:", req.file.originalname);
-
-    // Process the uploaded file
-    const result = await processSalesData(req.file.path);
-
-    // Send success response with results
-    res.json({
-      downloadUrl: result.downloadUrl,
-      aggregatedData: result.aggregatedData,
-      metrics: result.metrics
-    });
-  } catch (error) {
-    console.error("Error processing file:", error);
-    res.status(500).json({ error: "Failed to process file" });
-  }
-};
-
 export async function uploadFile(req: FileRequest, res: Response): Promise<void> {
   try {
     console.log("Upload request received");

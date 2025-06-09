@@ -9,16 +9,15 @@ import { parentPort } from "worker_threads";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Service for handling CSV file processing
 interface ProcessingResult {
   success: boolean;
   error?: string;
-  downloadUrl?: string;
-  aggregatedData?: Record<string, number>;
-  metrics?: {
+  aggregatedData: Record<string, number>;
+  metrics: {
+    processingTimeMs: number;
     totalRows: number;
     uniqueDepartments: number;
-    processingTimeMs: number;
+    departments: string[];
   };
 }
 
@@ -69,15 +68,15 @@ parentPort.on('message', async (data) => {
         })
         .on('end', () => {
           console.log("CSV processing completed");
-  // Write results to CSV
-  const writeStream = fs.createWriteStream(outputPath);
+          // Write results to CSV
+          const writeStream = fs.createWriteStream(outputPath);
           writeStream.write("DepartmentName,TotalNumberOfSales\\n");
           
-  Object.entries(aggregatedData).forEach(([dept, sales]) => {
+          Object.entries(aggregatedData).forEach(([dept, sales]) => {
             writeStream.write(\`\${dept},\${sales}\\n\`);
-  });
+          });
           
-  writeStream.end();
+          writeStream.end();
           resolve();
         })
         .on('error', (error) => {
@@ -115,110 +114,58 @@ parentPort.on('message', async (data) => {
 });
 `;
 
-// Process the uploaded CSV file
-export const processSalesData = async (filePath: string): Promise<ProcessingResult> => {
-  const startTime = Date.now();
+export async function processSalesData(inputPath: string, outputPath: string): Promise<ProcessingResult> {
+  console.log("Starting processSalesData");
+  console.log("Input path:", inputPath);
+  console.log("Output path:", outputPath);
 
-  try {
-    // Create a worker to process the file
-    const worker = new Worker(`
-      const { parentPort } = require('worker_threads');
-      const fs = require('fs');
-      const csv = require('csv-parse');
+  return new Promise((resolve, reject) => {
+    const startTime = process.hrtime();
 
-      parentPort.on('message', async (data) => {
-        try {
-          const { filePath } = data;
-          const fileContent = fs.readFileSync(filePath, 'utf-8');
-          const departments = new Map();
-          let totalRows = 0;
-
-          // Process CSV data
-          const parser = csv.parse({
-            columns: true,
-            skip_empty_lines: true
-          });
-
-          parser.on('readable', () => {
-            let record;
-            while ((record = parser.read())) {
-              totalRows++;
-              const dept = record.Department;
-              const amount = parseFloat(record['Sales Amount']);
-              
-              if (!isNaN(amount)) {
-                departments.set(dept, (departments.get(dept) || 0) + amount);
-              }
-            }
-          });
-
-          parser.on('end', () => {
-            // Send results back to main thread
-            parentPort.postMessage({
-              success: true,
-              aggregatedData: Object.fromEntries(departments),
-              metrics: {
-                totalRows,
-                uniqueDepartments: departments.size,
-                processingTimeMs: Date.now() - startTime
-              }
-            });
-          });
-
-          parser.write(fileContent);
-          parser.end();
-        } catch (error) {
-          parentPort.postMessage({
-            success: false,
-            error: error.message
-          });
-        }
-      });
-    `, { eval: true });
-
-    // Send file path to worker
-    worker.postMessage({ filePath });
-
-    // Wait for worker to complete
-    return new Promise((resolve, reject) => {
-      worker.on('message', (result) => {
-        if (result.success) {
-          // Generate download URL
-          const downloadUrl = `/download/${path.basename(filePath)}`;
-          
-          resolve({
-            success: true,
-            downloadUrl,
-            aggregatedData: result.aggregatedData,
-            metrics: result.metrics
-          });
-        } else {
-          reject(new Error(result.error));
-        }
+    try {
+      const worker = new Worker(workerCode, { 
+        eval: true,
+        workerData: { inputPath, outputPath } as WorkerData
       });
 
-      worker.on('error', (error) => {
+      console.log("Worker created");
+
+      worker.on("message", (result: ProcessingResult) => {
+        console.log("Received message from worker:", result);
+        if (!result.success) {
+          reject(new Error(result.error || "Worker processing failed"));
+          return;
+        }
+
+        const [seconds, nanoseconds] = process.hrtime(startTime);
+        const processingTimeMs = seconds * 1000 + nanoseconds / 1000000;
+        
+        resolve({
+          ...result,
+          metrics: {
+            ...result.metrics,
+            processingTimeMs
+          }
+        });
+      });
+
+      worker.on("error", (error) => {
+        console.error("Worker error:", error);
         reject(error);
       });
 
-      worker.on('exit', (code) => {
+      worker.on("exit", (code) => {
+        console.log("Worker exited with code:", code);
         if (code !== 0) {
           reject(new Error(`Worker stopped with exit code ${code}`));
         }
       });
-    });
-  } catch (error) {
-    console.error("Error in processSalesData:", error);
-    return {
-      success: false,
-      error: error.message
-    };
-  } finally {
-    // Clean up temporary file
-    try {
-  fs.unlinkSync(filePath);
+
+      console.log("Worker event listeners attached");
+      worker.postMessage({ inputPath, outputPath });
     } catch (error) {
-      console.error("Error deleting temporary file:", error);
+      console.error("Error creating worker:", error);
+      reject(error);
     }
+  });
 }
-};

@@ -1,9 +1,7 @@
-// Custom hook for handling file upload functionality
 import { useState } from "react";
 
 // this function contains everything required  for the file upload form, which includes the states, that allows to show progress indicator
 export const useFileUpload = () => {
-  // State for managing upload process
   const [state, setState] = useState({
     file: null,
     isUploading: false,
@@ -14,7 +12,6 @@ export const useFileUpload = () => {
     metrics: null
   });
 
-  // Reset all state values to initial state
   const resetState = () => {
     setState({
       file: null,
@@ -27,7 +24,6 @@ export const useFileUpload = () => {
     });
   };
 
-  // Handle file upload process
   const uploadFile = async (file) => {
     if (!file) {
       setState((prev) => ({ ...prev, error: "Please select a file first" }));
@@ -53,7 +49,7 @@ export const useFileUpload = () => {
 
       console.log("Uploading file:", file.name);
 
-      // Simulate progress updates
+      // Simulate progress
       const progressInterval = setInterval(() => {
         setState((prev) => {
           if (prev.uploadProgress >= 90) {
@@ -67,8 +63,7 @@ export const useFileUpload = () => {
         });
       }, 500);
 
-      // Send file to server
-      const response = await fetch("https://pharma-connect-backend-8cay.onrender.com/upload", {
+      const response = await fetch("http://localhost:5500/upload", {
         method: "POST",
         body: formData
       });
@@ -86,11 +81,9 @@ export const useFileUpload = () => {
         throw new Error("No download URL received from server");
       }
 
-      // Calculate total API time
       const totalApiTimeMs = Date.now() - startTime;
       console.log("Total API time (ms):", totalApiTimeMs);
 
-      // Update state with response data
       setState((prev) => ({
         ...prev,
         downloadLink: data.downloadUrl,
