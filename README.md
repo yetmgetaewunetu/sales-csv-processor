@@ -82,11 +82,10 @@ From the root directory, you can use the following commands:
 - `npm run install:all` - Install all dependencies
 - `npm run dev` - Run both frontend and backend in development mode
 - `npm run build` - Build both frontend and backend
-- `npm run test` - Run tests for both frontend and backend
 
 Individual component scripts:
-- Frontend: `npm run dev:frontend`, `npm run build:frontend`, `npm run test:frontend`
-- Backend: `npm run dev:backend`, `npm run build:backend`, `npm run test:backend`
+- Frontend: `npm run dev:frontend`, `npm run build:frontend`
+- Backend: `npm run dev:backend`, `npm run build:backend`
 
 ## Algorithm Explanation
 
