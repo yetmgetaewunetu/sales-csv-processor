@@ -17,31 +17,44 @@ export const useFileUpload = () => {
       return;
     }
 
-    setState((prev) => ({ ...prev, isUploading: true, error: "" }));
+    // Reset states before starting upload
+    setState((prev) => ({
+      ...prev,
+      isUploading: true,
+      error: "",
+      downloadLink: "",
+    }));
 
     try {
       const formData = new FormData();
       formData.append("file", file);
 
+      console.log("Uploading file:", file.name);
       const response = await axios.post(
-        "https://sales-csv-processor-backend.onrender.com/upload",
+        `http://localhost:5500/upload`,
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },
         }
       );
-      console.log(response.data.downloadUrl);
+      console.log("Upload response:", response.data);
+
+      if (!response.data.downloadUrl) {
+        throw new Error("No download URL received from server");
+      }
 
       setState((prev) => ({
         ...prev,
-        downloadLink: response.data.downloadUrl || "",
+        downloadLink: response.data.downloadUrl,
         error: "",
         res: response.data,
       }));
     } catch (err) {
+      console.error("Upload error:", err);
       setState((prev) => ({
         ...prev,
-        error: err.response?.data?.message || "Failed to process file",
+        error: err.response?.data?.message || err.message || "Failed to process file",
+        downloadLink: "",
       }));
     } finally {
       setState((prev) => ({ ...prev, isUploading: false }));

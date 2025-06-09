@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { useFileUpload } from "../hooks/useFileUpload";
 import { FileInfoDisplay } from "./FileInfoDisplay";
 import { DownloadLink } from "./DownloadLink";
@@ -13,10 +13,24 @@ export const CSVUploadForm = () => {
   const { file, isUploading, downloadLink, error, setFile, uploadFile } =
     useFileUpload();
 
+  // Update link when downloadLink changes
+  useEffect(() => {
+    if (downloadLink) {
+      setLink(downloadLink);
+    }
+  }, [downloadLink]);
+
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
     setLink(null);
-    if (selectedFile?.type !== "text/csv") {
+    if (!selectedFile) {
+      setFile(null);
+      return;
+    }
+    // Check if file is CSV by extension or type
+    const isCSV = selectedFile.type === "text/csv" || 
+                 selectedFile.name.toLowerCase().endsWith('.csv');
+    if (!isCSV) {
       setFile(null);
       return;
     }
@@ -25,9 +39,16 @@ export const CSVUploadForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    uploadFile(file);
-    setLink(downloadLink);
-    setFile(null);
+    try {
+      await uploadFile(file);
+    } catch (err) {
+      console.error('Upload failed:', err);
+    } finally {
+      // Only clear the file if the upload was successful
+      if (!error) {
+        setFile(null);
+      }
+    }
   };
 
   const triggerFileInput = () => {
