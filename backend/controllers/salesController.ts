@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { v4 as uuidv4 } from "uuid";
 import path from "path";
-import { processSalesData } from "../services/csvUploadServices";
+import { Worker } from "worker_threads";
 import { UploadResponse } from "../utils/types";
 import dotenv from "dotenv";
 
@@ -18,21 +18,43 @@ export async function uploadFile(req: Request, res: Response): Promise<void> {
     }
 
     const fileId = uuidv4();
-    // i will use this path for storing the outupt data, some demo is availabe on the github rep /backend/outputs
     const outputPath = path.join(process.cwd(), "output", `${fileId}.csv`);
 
-    // Processing the file and get aggregated data
-    const aggregatedData = await processSalesData(req.file.path, outputPath);
+    // Create a new worker
+    const worker = new Worker(
+      path.join(process.cwd(), "workers", "csvProcessor.js"),
+      {
+        workerData: { filePath: req.file.path, outputPath },
+      }
+    );
 
-    // Generate download URL
-    const downloadUrl = `https://sales-csv-processor-backend.onrender.com/output/${fileId}.csv`;
+    // Handle worker messages
+    worker.on("message", (result) => {
+      if (result.success) {
+        // const downloadUrl = `http://localhost:${PORT}/output/${fileId}.csv`;
+        const downloadUrl = `https://sales-csv-processor-backend.onrender.com/output/${fileId}.csv`;
+        const response: UploadResponse = {
+          fileId,
+          downloadUrl,
+        };
+        res.json({ ...response, aggregatedData: result.data });
+      } else {
+        res.status(500).json({ error: result.error });
+      }
+    });
 
-    const response: UploadResponse = {
-      fileId,
-      downloadUrl,
-    };
+    // Handle worker errors
+    worker.on("error", (error) => {
+      console.error("Worker error:", error);
+      res.status(500).json({ error: "Failed to process file" });
+    });
 
-    res.json({ ...response, aggregatedData });
+    // Handle worker exit
+    worker.on("exit", (code) => {
+      if (code !== 0) {
+        console.error(`Worker stopped with exit code ${code}`);
+      }
+    });
   } catch (error) {
     console.error("Upload error:", error);
     res.status(500).json({ error: "Internal server error" });

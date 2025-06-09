@@ -4,7 +4,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "npx tsx --watch  server.ts"
+    "start": "npx tsx --watch server.ts"
   },
   "author": "",
   "license": "ISC",
