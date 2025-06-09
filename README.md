@@ -18,7 +18,30 @@ A full-stack application for processing sales data from CSV files, featuring rea
 - Node.js (v14 or higher)
 - npm or yarn
 
-### Backend Setup
+### Quick Start (Recommended)
+1. Clone the repository:
+```bash
+git clone <repository-url>
+cd sales-csv-processor
+```
+
+2. Install all dependencies (root, frontend, and backend):
+```bash
+npm run install:all
+```
+
+3. Start both frontend and backend servers:
+```bash
+npm run dev
+```
+
+The application will be available at:
+- Frontend: http://localhost:5173
+- Backend: http://localhost:5500
+
+### Alternative Setup (Individual Components)
+
+#### Backend Setup
 1. Navigate to the backend directory:
 ```bash
 cd sales-csv-processor/backend
@@ -35,7 +58,7 @@ npm start
 ```
 The backend server will run on http://localhost:5500
 
-### Frontend Setup
+#### Frontend Setup
 1. Navigate to the frontend directory:
 ```bash
 cd sales-csv-processor/frontend
@@ -51,6 +74,19 @@ npm install
 npm run dev
 ```
 The frontend will be available at http://localhost:5173
+
+### Available Scripts
+
+From the root directory, you can use the following commands:
+
+- `npm run install:all` - Install all dependencies
+- `npm run dev` - Run both frontend and backend in development mode
+- `npm run build` - Build both frontend and backend
+- `npm run test` - Run tests for both frontend and backend
+
+Individual component scripts:
+- Frontend: `npm run dev:frontend`, `npm run build:frontend`, `npm run test:frontend`
+- Backend: `npm run dev:backend`, `npm run build:backend`, `npm run test:backend`
 
 ## Algorithm Explanation
 
