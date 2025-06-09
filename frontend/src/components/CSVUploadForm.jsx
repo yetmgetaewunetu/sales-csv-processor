@@ -10,7 +10,7 @@ import CSVPreview from "./CSVPreview";
 export const CSVUploadForm = () => {
   const [link, setLink] = useState(null);
   const fileInputRef = useRef(null);
-  const { file, isUploading, uploadProgress, downloadLink, error, setFile, uploadFile } =
+  const { file, isUploading, downloadLink, error, setFile, uploadFile } =
     useFileUpload();
 
   // Update link when downloadLink changes
@@ -88,20 +88,10 @@ export const CSVUploadForm = () => {
 
             <ErrorDisplay error={error} />
 
-            <div className="space-y-2">
-              <SubmitButton
-                disabled={!file || isUploading}
-                isUploading={isUploading}
-              />
-              {isUploading && (
-                <div className="w-full bg-gray-200 rounded-full h-2.5">
-                  <div
-                    className="bg-blue-600 h-2.5 rounded-full transition-all duration-300"
-                    style={{ width: `${uploadProgress}%` }}
-                  ></div>
-                </div>
-              )}
-            </div>
+            <SubmitButton
+              disabled={!file || isUploading}
+              isUploading={isUploading}
+            />
 
             {link && <DownloadLink downloadLink={link} />}
           </form>
