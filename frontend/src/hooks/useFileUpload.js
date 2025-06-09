@@ -23,7 +23,7 @@ export const useFileUpload = () => {
       formData.append("file", file);
 
       const response = await axios.post(
-        "http://localhost:5500/upload",
+        "https://sales-csv-processor-backend.onrender.com/upload",
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },
