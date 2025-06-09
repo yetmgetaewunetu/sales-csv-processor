@@ -32,7 +32,7 @@ npm run install:all
 
 3. Start both frontend and backend servers:
 ```bash
-npm run dev
+npm run start
 ```
 
 The application will be available at:

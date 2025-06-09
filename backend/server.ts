@@ -23,7 +23,7 @@ const port = 5500; // Hardcoding the port since we know it's running on 5500
 
 app.listen(port, (err) => {
   if (err) {
-    console.log("failed to start server");
+    console.log("failed to start server", err.message);
   } else {
     console.log(`Server running on port: ${port}`);
     console.log(`Static files being served from: ${outputPath}`);
