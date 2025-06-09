@@ -84,7 +84,7 @@ export async function uploadFile(req: FileRequest, res: Response): Promise<void>
 
 
     // the downloadable url for the output file
-    const downloadUrl = `https://pharma-connect-backend-8cay.onrender.com/output/${fileId}.csv`;
+    const downloadUrl = `http://localhost:5500/output/${fileId}.csv`;
     console.log("Generated download URL:", downloadUrl);
 
     const response: UploadResponse = {

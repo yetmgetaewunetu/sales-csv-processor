@@ -69,15 +69,15 @@ parentPort.on('message', async (data) => {
         })
         .on('end', () => {
           console.log("CSV processing completed");
-          // Write results to CSV
-          const writeStream = fs.createWriteStream(outputPath);
+  // Write results to CSV
+  const writeStream = fs.createWriteStream(outputPath);
           writeStream.write("DepartmentName,TotalNumberOfSales\\n");
           
-          Object.entries(aggregatedData).forEach(([dept, sales]) => {
+  Object.entries(aggregatedData).forEach(([dept, sales]) => {
             writeStream.write(\`\${dept},\${sales}\\n\`);
-          });
+  });
           
-          writeStream.end();
+  writeStream.end();
           resolve();
         })
         .on('error', (error) => {
@@ -216,9 +216,9 @@ export const processSalesData = async (filePath: string): Promise<ProcessingResu
   } finally {
     // Clean up temporary file
     try {
-      fs.unlinkSync(filePath);
+  fs.unlinkSync(filePath);
     } catch (error) {
       console.error("Error deleting temporary file:", error);
     }
-  }
+}
 };
