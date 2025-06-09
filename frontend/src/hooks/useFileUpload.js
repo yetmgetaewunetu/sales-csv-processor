@@ -9,6 +9,7 @@ export const useFileUpload = () => {
     downloadLink: "",
     error: "",
     res: null,
+    uploadProgress: 0,
   });
 
   const uploadFile = async (file) => {
@@ -23,6 +24,7 @@ export const useFileUpload = () => {
       isUploading: true,
       error: "",
       downloadLink: "",
+      uploadProgress: 0,
     }));
 
     try {
@@ -32,9 +34,19 @@ export const useFileUpload = () => {
       console.log("Uploading file:", file.name);
       const response = await axios.post(
         `https://sales-csv-processor-backend.onrender.com/upload`,
+        // `http://localhost:5500/upload`,
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },
+          onUploadProgress: (progressEvent) => {
+            const percentCompleted = Math.round(
+              (progressEvent.loaded * 100) / progressEvent.total
+            );
+            setState((prev) => ({
+              ...prev,
+              uploadProgress: percentCompleted,
+            }));
+          },
         }
       );
       console.log("Upload response:", response.data);
@@ -48,6 +60,7 @@ export const useFileUpload = () => {
         downloadLink: response.data.downloadUrl,
         error: "",
         res: response.data,
+        uploadProgress: 100,
       }));
     } catch (err) {
       console.error("Upload error:", err);
@@ -55,6 +68,7 @@ export const useFileUpload = () => {
         ...prev,
         error: err.response?.data?.message || err.message || "Failed to process file",
         downloadLink: "",
+        uploadProgress: 0,
       }));
     } finally {
       setState((prev) => ({ ...prev, isUploading: false }));
