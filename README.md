@@ -1,3 +1,65 @@
+# CSV Sales Data Processor
+
+A simple web application that processes CSV files containing sales data. It calculates total sales by department and provides processing metrics.
+
+## Features
+
+- Upload CSV files
+- Real-time upload progress
+- Process sales data by department
+- View processing metrics (total rows, departments, processing time)
+- Download processed results
+
+## Setup
+
+1. Install dependencies:
+```bash
+# Backend
+cd backend
+npm install
+
+# Frontend
+cd frontend
+npm install
+```
+
+2. Start the development servers:
+```bash
+# Backend
+cd backend
+npm run dev
+
+# Frontend
+cd frontend
+npm run dev
+```
+
+## How to Use
+
+1. Click the upload area or drag and drop a CSV file
+2. The file should have these columns:
+   - Department
+   - Sales Amount
+3. Click "Process CSV" to upload
+4. Wait for processing to complete
+5. View the results and download the processed file
+
+## File Format
+
+Your CSV file should look like this:
+```csv
+Department,Sales Amount
+Electronics,1000.50
+Clothing,750.25
+Electronics,500.75
+```
+
+## Tech Stack
+
+- Frontend: React, Tailwind CSS
+- Backend: Node.js, Express
+- File Processing: Node.js Worker Threads
+
 <h1>
   Project Title: CSV file SalesData Hanlding web app 
 </h1> 

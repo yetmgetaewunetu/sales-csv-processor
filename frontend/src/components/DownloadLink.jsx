@@ -1,32 +1,23 @@
 // download link button that is displayed when a processed csv file is returned
 
-export const DownloadLink = ({ downloadLink }) => (
-  <div className="mt-4 p-3 bg-green-50 rounded-md border border-green-200">
-    <p className="text-sm text-green-800 mb-2">File processed successfully!</p>
-    <a
-      href={downloadLink}
-      className="inline-flex items-center text-blue-600 hover:text-blue-800"
-      download
-    >
-      <DownloadIcon />
-      Download Processed File
-    </a>
-  </div>
-);
+import React from "react";
+import { Download } from "lucide-react";
 
-const DownloadIcon = () => (
-  <svg
-    className="w-5 h-5 mr-2"
-    fill="none"
-    stroke="currentColor"
-    viewBox="0 0 24 24"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth="2"
-      d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-    />
-  </svg>
-);
+export const DownloadLink = ({ downloadLink }) => {
+  if (!downloadLink) return null;
+
+  return (
+    <div className="mt-4 p-4 bg-green-50 rounded-lg">
+      <div className="flex items-center justify-between">
+        <p className="text-green-700 font-medium">File processed successfully!</p>
+        <button
+          onClick={() => window.open(downloadLink, "_blank")}
+          className="flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
+        >
+          <Download className="h-4 w-4 mr-2" />
+          Download Processed File
+        </button>
+      </div>
+    </div>
+  );
+};

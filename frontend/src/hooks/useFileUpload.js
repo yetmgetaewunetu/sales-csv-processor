@@ -1,17 +1,33 @@
+// Custom hook for handling file upload functionality
 import { useState } from "react";
-import axios from "axios";
 
 // this function contains everything required  for the file upload form, which includes the states, that allows to show progress indicator
 export const useFileUpload = () => {
+  // State for managing upload process
   const [state, setState] = useState({
     file: null,
     isUploading: false,
     downloadLink: "",
     error: "",
-    res: null,
     uploadProgress: 0,
+    aggregatedData: {},
+    metrics: null
   });
 
+  // Reset all state values to initial state
+  const resetState = () => {
+    setState({
+      file: null,
+      isUploading: false,
+      downloadLink: "",
+      error: "",
+      uploadProgress: 0,
+      aggregatedData: {},
+      metrics: null
+    });
+  };
+
+  // Handle file upload process
   const uploadFile = async (file) => {
     if (!file) {
       setState((prev) => ({ ...prev, error: "Please select a file first" }));
@@ -25,50 +41,76 @@ export const useFileUpload = () => {
       error: "",
       downloadLink: "",
       uploadProgress: 0,
+      aggregatedData: {},
+      metrics: null
     }));
+
+    const startTime = Date.now();
 
     try {
       const formData = new FormData();
       formData.append("file", file);
 
       console.log("Uploading file:", file.name);
-      const response = await axios.post(
-        `https://sales-csv-processor-backend.onrender.com/upload`,
-        // `http://localhost:5500/upload`,
-        formData,
-        {
-          headers: { "Content-Type": "multipart/form-data" },
-          onUploadProgress: (progressEvent) => {
-            const percentCompleted = Math.round(
-              (progressEvent.loaded * 100) / progressEvent.total
-            );
-            setState((prev) => ({
-              ...prev,
-              uploadProgress: percentCompleted,
-            }));
-          },
-        }
-      );
-      console.log("Upload response:", response.data);
 
-      if (!response.data.downloadUrl) {
+      // Simulate progress updates
+      const progressInterval = setInterval(() => {
+        setState((prev) => {
+          if (prev.uploadProgress >= 90) {
+            clearInterval(progressInterval);
+            return prev;
+          }
+          return {
+            ...prev,
+            uploadProgress: prev.uploadProgress + 10
+          };
+        });
+      }, 500);
+
+      // Send file to server
+      const response = await fetch("https://pharma-connect-backend-8cay.onrender.com/upload", {
+        method: "POST",
+        body: formData
+      });
+
+      clearInterval(progressInterval);
+
+      if (!response.ok) {
+        throw new Error("Upload failed");
+      }
+
+      const data = await response.json();
+      console.log("Upload response:", data);
+
+      if (!data.downloadUrl) {
         throw new Error("No download URL received from server");
       }
 
+      // Calculate total API time
+      const totalApiTimeMs = Date.now() - startTime;
+      console.log("Total API time (ms):", totalApiTimeMs);
+
+      // Update state with response data
       setState((prev) => ({
         ...prev,
-        downloadLink: response.data.downloadUrl,
+        downloadLink: data.downloadUrl,
         error: "",
-        res: response.data,
         uploadProgress: 100,
+        aggregatedData: data.aggregatedData || {},
+        metrics: {
+          ...data.metrics,
+          totalApiTimeMs
+        }
       }));
     } catch (err) {
       console.error("Upload error:", err);
       setState((prev) => ({
         ...prev,
-        error: err.response?.data?.message || err.message || "Failed to process file",
+        error: err.message || "Failed to process file",
         downloadLink: "",
         uploadProgress: 0,
+        aggregatedData: {},
+        metrics: null
       }));
     } finally {
       setState((prev) => ({ ...prev, isUploading: false }));
@@ -77,7 +119,11 @@ export const useFileUpload = () => {
 
   return {
     ...state,
-    setFile: (file) => setState((prev) => ({ ...prev, file })),
+    setFile: (file) => {
+      // Reset state when a new file is selected
+      resetState();
+      setState((prev) => ({ ...prev, file }));
+    },
     uploadFile,
   };
 };

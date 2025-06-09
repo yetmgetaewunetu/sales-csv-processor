@@ -39,7 +39,7 @@ const CSVPreview = ({ file, maxRows = 5 }) => {
   if (!file) return null;
 
   return (
-    <div className="mt-6 border rounded-lg overflow-hidden">
+    <div className="mt-6 border w-11/12 mx-auto rounded-lg overflow-hidden">
       <div className="bg-gray-50 px-4 py-2 border-b">
         <h3 className="font-medium text-gray-700">
           CSV Preview (First {maxRows} rows)

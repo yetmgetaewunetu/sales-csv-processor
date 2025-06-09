@@ -1,25 +1,29 @@
+// Main form component for CSV file upload and processing
 import { useRef, useState, useEffect } from "react";
 import { useFileUpload } from "../hooks/useFileUpload";
 import { FileInfoDisplay } from "./FileInfoDisplay";
 import { DownloadLink } from "./DownloadLink";
 import { ErrorDisplay } from "./ErrorDisplay";
+import { ProcessingResults } from "./ProcessingResults";
 import CSVPreview from "./CSVPreview";
 
-// the entry for the upload form
-// includes custom upload component and button to send post request to backend server
 export const CSVUploadForm = () => {
+  // State for download link and file input reference
   const [link, setLink] = useState(null);
   const fileInputRef = useRef(null);
-  const { file, isUploading, downloadLink, error, setFile, uploadFile, uploadProgress } =
+
+  // Get upload functionality and state from custom hook
+  const { file, isUploading, downloadLink, error, setFile, uploadFile, uploadProgress, metrics, aggregatedData } =
     useFileUpload();
 
-  // Update link when downloadLink changes
+  // Update link when download URL changes
   useEffect(() => {
     if (downloadLink) {
       setLink(downloadLink);
     }
   }, [downloadLink]);
 
+  // Handle file selection
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
     setLink(null);
@@ -27,7 +31,7 @@ export const CSVUploadForm = () => {
       setFile(null);
       return;
     }
-    // Check if file is CSV by extension or type
+    // Check if file is CSV
     const isCSV = selectedFile.type === "text/csv" || 
                  selectedFile.name.toLowerCase().endsWith('.csv');
     if (!isCSV) {
@@ -37,20 +41,21 @@ export const CSVUploadForm = () => {
     setFile(selectedFile);
   };
 
+  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       await uploadFile(file);
+      // Clear file input after successful upload
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
     } catch (err) {
       console.error('Upload failed:', err);
-    } finally {
-      // Only clear the file if the upload was successful
-      if (!error) {
-        setFile(null);
-      }
     }
   };
 
+  // Trigger file input click
   const triggerFileInput = () => {
     fileInputRef.current.click();
   };
@@ -58,12 +63,13 @@ export const CSVUploadForm = () => {
   return (
     <>
       <div className="flex flex-col gap-7">
-        <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-md">
+        <div className="w-11/12 mx-auto p-6 bg-white rounded-lg shadow-md">
           <h2 className="text-2xl font-bold text-gray-800 mb-6">
             CSV Sales Data Processor
           </h2>
 
           <form onSubmit={handleSubmit} className="space-y-4">
+            {/* File upload area */}
             <div
               className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
                 file
@@ -86,15 +92,21 @@ export const CSVUploadForm = () => {
               )}
             </div>
 
+            {/* Error message display */}
             <ErrorDisplay error={error} />
 
+            {/* Upload button with progress */}
             <SubmitButton
               disabled={!file || isUploading}
               isUploading={isUploading}
               uploadProgress={uploadProgress}
             />
 
+            {/* Download link after successful upload */}
             {link && <DownloadLink downloadLink={link} />}
+            
+            {/* Processing results and metrics */}
+            <ProcessingResults metrics={metrics} aggregatedData={aggregatedData} />
           </form>
         </div>
         <CSVPreview file={file} />
@@ -103,7 +115,7 @@ export const CSVUploadForm = () => {
   );
 };
 
-// Small helper components
+// Default content shown in upload area
 const DefaultUploadContent = () => (
   <>
     <p className="text-sm text-gray-600">
@@ -114,6 +126,7 @@ const DefaultUploadContent = () => (
   </>
 );
 
+// Upload button with progress indicator
 const SubmitButton = ({ disabled, isUploading, uploadProgress }) => (
   <button
     type="submit"
