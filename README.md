@@ -16,12 +16,12 @@ A full-stack application for processing sales data from CSV files, featuring rea
 
 ### Prerequisites
 - Node.js (v14 or higher)
-- npm or yarn
+
 
 ### Quick Start (Recommended)
 1. Clone the repository:
 ```bash
-git clone <repository-url>
+git clone https://github.com/yetmgetaewunetu/sales-csv-processor.git
 cd sales-csv-processor
 ```
 
